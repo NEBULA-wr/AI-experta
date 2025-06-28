@@ -29,7 +29,7 @@ document.addEventListener('DOMContentLoaded', () => {
         addMessage("Protocolo Singularidad iniciado. Soy Nexus. Estoy a tu disposición.", 'ai');
     }, 3000);
 
-    // --- Lógica de Temas con Posicionamiento JS (REPARADO Y CON CONTROL DE CLICK) ---
+    // --- Lógica de Temas con Posicionamiento JS ---
     const themes = {
         'Quantum Blue': { primary: '#00f6ff', userGradient: 'linear-gradient(135deg, #00f6ff, #6d28d9)'},
         'Gold Standard': { primary: '#ffd700', userGradient: 'linear-gradient(135deg, #ffd700, #fca311)' },
@@ -57,7 +57,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!coreSwatches || !coreCenter) return;
         coreSwatches.innerHTML = '';
         const themeNames = Object.keys(themes);
-        const radius = 45; // Radio del círculo en píxeles
+        const radius = 45;
         themeNames.forEach((name, i) => {
             const angle = (i / themeNames.length) * 2 * Math.PI;
             const swatch = document.createElement('div');
@@ -67,7 +67,7 @@ document.addEventListener('DOMContentLoaded', () => {
             swatch.style.left = `calc(50% + ${radius * Math.cos(angle)}px)`;
             swatch.style.top = `calc(50% + ${radius * Math.sin(angle)}px)`;
             swatch.addEventListener('click', (e) => {
-                e.stopPropagation(); // Evitar que el click en un color se propague al window y cierre el menú antes de cambiar el tema
+                e.stopPropagation();
                 applyTheme(name, true);
                 closeColorCore();
             });
@@ -75,7 +75,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
         
         coreCenter.addEventListener('click', (e) => {
-            e.stopPropagation(); // Evitar que el click se propague al window
+            e.stopPropagation();
             isColorCoreOpen = !isColorCoreOpen;
             colorCore.classList.toggle('is-open', isColorCoreOpen);
         });
@@ -83,7 +83,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Animación de Fondo: Red Neuronal Viva ---
     let neurons = [];
-    class Neuron { /* ... clase Neuron (sin cambios) ... */
+    class Neuron {
         constructor() { this.x = Math.random() * window.innerWidth; this.y = Math.random() * window.innerHeight; this.size = Math.random() * 1.5 + 1; this.vx = (Math.random() - 0.5) * 0.2; this.vy = (Math.random() - 0.5) * 0.2; this.baseColor = '#8a94a6'; }
         draw(ctx, color) { ctx.fillStyle = color; ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.fill(); }
         update(ctx, mouse, color) {
@@ -99,12 +99,12 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
     }
-    function initCanvases() { /* ... función initCanvases (sin cambios) ... */
+    function initCanvases() {
         [bgCanvas, neuralCanvas].forEach(c => { c.width = window.innerWidth; c.height = window.innerHeight; });
         neurons = []; const neuronCount = Math.floor((window.innerWidth * window.innerHeight) / 10000);
         for (let i = 0; i < neuronCount; i++) neurons.push(new Neuron());
     }
-    function animate() { /* ... función animate (sin cambios) ... */
+    function animate() {
         bgCtx.clearRect(0, 0, bgCanvas.width, bgCanvas.height);
         neuralCtx.clearRect(0, 0, neuralCanvas.width, neuralCanvas.height);
         const theme = themes[localStorage.getItem('nexusTheme') || 'Quantum Blue'];
@@ -116,22 +116,34 @@ document.addEventListener('DOMContentLoaded', () => {
         requestAnimationFrame(animate);
     }
 
-    // --- Lógica del Chat y Botones (Corregida y Verificada) ---
+    // --- Lógica del Chat y Botones (CON LA URL DE RENDER INTEGRADA) ---
     async function handleFormSubmit(e) {
         if(e) e.preventDefault();
         const userMessage = userInput.value.trim(); if (!userMessage) return;
         const startTime = Date.now(); addMessage(userMessage, 'user'); userInput.value = '';
         const loading = addLoadingIndicator();
+
+        // ** AQUÍ ESTÁ EL CAMBIO **
+        const backendUrl = 'https://ai-experta-1.onrender.com';
+
         try {
             const history = isMemoryEnabled ? chatHistory : [];
-            const res = await fetch('/api/chat', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ message: userMessage, history }) });
+            const res = await fetch(`${backendUrl}/api/chat`, { // Usamos la URL completa
+                method: 'POST', 
+                headers: { 'Content-Type': 'application/json' }, 
+                body: JSON.stringify({ message: userMessage, history }) 
+            });
             if (!res.ok) throw new Error(`Error del servidor: ${res.status}`);
             const data = await res.json();
             const responseTime = ((Date.now() - startTime) / 1000).toFixed(2);
             lastAiResponse = data.reply;
             if (isMemoryEnabled) { chatHistory.push({ role: 'user', content: userMessage }, { role: 'assistant', content: data.reply }); }
             loading.remove(); addMessage(data.reply, 'ai', responseTime);
-        } catch (err) { console.error(err); loading.remove(); addMessage('La conexión con la Singularidad ha fallado. Revisa la conexión del servidor y la API Key.', 'ai'); }
+        } catch (err) { 
+            console.error(err); 
+            loading.remove(); 
+            addMessage('La conexión con la Singularidad ha fallado. Revisa la conexión del servidor y la API Key.', 'ai'); 
+        }
     }
     
     // --- Listeners y Notificaciones ---
@@ -141,7 +153,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if(clearBtn) clearBtn.addEventListener('click', () => { chatBox.innerHTML = ''; chatHistory = []; lastAiResponse = ""; showTempNotification('Simulación Reiniciada'); addMessage("Protocolo Singularidad reiniciado.", 'ai');});
     if(copyBtn) copyBtn.addEventListener('click', () => { lastAiResponse ? navigator.clipboard.writeText(lastAiResponse).then(() => showTempNotification('Respuesta Clonada al Portapapeles')).catch(() => showTempNotification('Error de Clonación')) : showTempNotification('No hay datos para clonar.'); });
     
-    // Listener para cerrar el selector de temas al hacer click fuera
     window.addEventListener('click', (e) => {
         if(isColorCoreOpen) {
             closeColorCore();
@@ -149,18 +160,18 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // --- Helpers de Renderizado con Metadatos e Iconos ---
-    const ICONS = { /* ... ICONS (sin cambios) ... */
+    const ICONS = {
         ai: `<svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 2a10 10 0 0 0-9.95 9.126L2 12l.05.274A10 10 0 0 0 12 22a10 10 0 0 0 10-10c0-5.52-4.48-10-10-10zm-3.5 7A1.5 1.5 0 0 1 10 10.5 1.5 1.5 0 0 1 8.5 12 1.5 1.5 0 0 1 7 10.5 1.5 1.5 0 0 1 8.5 9zm7 0A1.5 1.5 0 0 1 17 10.5 1.5 1.5 0 0 1 15.5 12 1.5 1.5 0 0 1 14 10.5 1.5 1.5 0 0 1 15.5 9zM7.12 14h9.76c.03.16.05.33.05.5a5.5 5.5 0 0 1-11 0c0-.17.02-.34.05-.5z"/></svg>`,
         user: `<svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>`
     }
-    function addMessage(text, sender, meta = null) { /* ... función addMessage (sin cambios) ... */
+    function addMessage(text, sender, meta = null) {
         if (!chatBox) return; const wrapper = document.createElement('div'); wrapper.className = `message-wrapper ${sender}-message-wrapper`;
         const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
         const metaText = sender === 'user' ? time : (meta ? `Respuesta generada en ${meta}s` : 'Analizando...');
         wrapper.innerHTML = `<div class="avatar">${ICONS[sender]}</div><div class="message-content"><div class="message"><p>${text}</p></div><div class="message-meta">${metaText}</div></div>`;
         chatBox.appendChild(wrapper); chatBox.scrollTop = chatBox.scrollHeight;
     }
-    function addLoadingIndicator() { /* ... función addLoadingIndicator (sin cambios) ... */
+    function addLoadingIndicator() {
         const wrapper = document.createElement('div'); wrapper.className = 'message-wrapper ai-message-wrapper';
         wrapper.innerHTML = `<div class="avatar">${ICONS.ai}</div><div class="message-content"><div class="message"><p>Accediendo a la red...</p></div><div class="message-meta">Estableciendo conexión...</div></div>`;
         chatBox.appendChild(wrapper); chatBox.scrollTop = chatBox.scrollHeight; return wrapper;
