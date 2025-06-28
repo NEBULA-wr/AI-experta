@@ -1,0 +1,74 @@
+/* style.css */
+@import url('https://fonts.googleapis.com/css2?family=Exo+2:wght@300;500;700&display=swap');
+
+:root {
+    --bg-color: #020308;
+    --text-primary: #e0e5f0;
+    --text-secondary: #8a94a6;
+    --ai-bg: rgba(10, 15, 30, 0.6);
+    --border-color: rgba(138, 148, 166, 0.2);
+    /* Variables de Tema (Controladas por JS) */
+    --primary-color: #00f6ff;
+    --glow-color: rgba(0, 246, 255, 0.3);
+    --user-bg: linear-gradient(135deg, var(--primary-color), #6d28d9);
+}
+
+body { font-family: 'Exo 2', sans-serif; background-color: var(--bg-color); color: var(--text-primary); margin: 0; overflow: hidden; }
+
+/* --- Animaciones de Fondo y UI Global --- */
+canvas { position: fixed; top: 0; left: 0; z-index: -1; }
+
+/* REPARADO Y MEJORADO: Ahora se controla con la clase .is-open desde JS */
+#color-core { position: absolute; top: 30px; right: 30px; z-index: 100; width: 60px; height: 60px; display: flex; justify-content: center; align-items: center; }
+#core-center { width: 20px; height: 20px; background: var(--primary-color); border-radius: 50%; box-shadow: 0 0 15px var(--glow-color); cursor: pointer; transition: transform 0.3s, background-color 0.3s; }
+#core-swatches { position: absolute; width: 100%; height: 100%; transform: scale(0); transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.4s; pointer-events: none; opacity: 0; }
+#color-core.is-open #core-swatches { transform: scale(1) rotate(0deg); pointer-events: all; opacity: 1; }
+#color-core:hover #core-center { transform: scale(1.2); }
+.swatch { position: absolute; width: 16px; height: 16px; border-radius: 50%; cursor: pointer; border: 1px solid rgba(255,255,255,0.5); transition: transform 0.2s; }
+.swatch:hover { transform: scale(1.3); }
+
+/* --- RESTO DE LA UI (Intacta y funcional) --- */
+#notification-container { position: fixed; bottom: 150px; left: 50%; transform: translateX(-50%); z-index: 200; display: flex; flex-direction: column; gap: 10px; align-items: center; pointer-events: none; }
+.notification-toast { background-color: var(--ai-bg); backdrop-filter: blur(10px); color: var(--text-primary); padding: 12px 22px; border-radius: 10px; border: 1px solid var(--border-color); box-shadow: 0 5px 25px rgba(0,0,0,0.5); animation: fade-in-out 5s ease-in-out forwards; }
+@keyframes fade-in-out { 0%, 100% { opacity: 0; transform: translateY(20px); } 10%, 90% { opacity: 1; transform: translateY(0); } }
+#intro-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: var(--bg-color); display: flex; justify-content: center; align-items: center; z-index: 1000; transition: opacity 1s ease-out; transition-delay: 2.5s; }
+#intro-overlay.hidden { opacity: 0; pointer-events: none; }
+.intro-content { text-align: center; }
+.intro-title { font-family: 'Orbitron', sans-serif; font-size: clamp(2.5rem, 8vw, 5rem); color: var(--primary-color); text-shadow: 0 0 15px var(--glow-color), 0 0 30px var(--glow-color); }
+.intro-subtitle { font-size: clamp(1rem, 3vw, 1.5rem); color: var(--text-secondary); }
+.chat-container { position: relative; z-index: 1; width: 100vw; height: 100vh; display: flex; flex-direction: column; opacity: 0; transition: opacity 1s ease-in; transition-delay: 3s; }
+.chat-container.visible { opacity: 1; }
+.chat-box { flex-grow: 1; overflow-y: auto; padding: 30px clamp(20px, 5vw, 150px); display: flex; flex-direction: column; gap: 30px; }
+.message-wrapper { display: flex; gap: 15px; max-width: 80%; animation: pop-in 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+@keyframes pop-in { from { opacity: 0; transform: scale(0.8); } to { opacity: 1; transform: scale(1); } }
+.user-message-wrapper { align-self: flex-end; flex-direction: row-reverse; }
+.ai-message-wrapper { align-self: flex-start; }
+.avatar { width: 45px; height: 45px; flex-shrink: 0; padding: 8px; border-radius: 50%; background: var(--ai-bg); border: 1px solid var(--border-color); }
+.message-content { display: flex; flex-direction: column; gap: 8px; }
+.message { background: var(--ai-bg); padding: 15px 20px; border-radius: 15px; line-height: 1.6; backdrop-filter: blur(10px); border: 1px solid var(--border-color); }
+.user-message-wrapper .message { background: var(--user-bg); border: none; }
+.message-meta { font-size: 0.75em; color: var(--text-secondary); padding: 0 10px; }
+.user-message-wrapper .message-meta { text-align: right; }
+.input-area-wrapper { padding: 20px clamp(20px, 5vw, 150px); background: linear-gradient(to top, rgba(2, 3, 8, 0.9) 30%, transparent 100%); }
+#chat-form { display: flex; align-items: center; background: var(--ai-bg); backdrop-filter: blur(10px); border: 1px solid var(--border-color); border-radius: 15px; padding: 10px 15px; transition: box-shadow 0.3s, border-color 0.3s; }
+#chat-form:focus-within { border-color: var(--primary-color); box-shadow: 0 0 20px var(--glow-color); }
+#user-input { flex-grow: 1; background: none; border: none; font-size: 1.1em; color: var(--text-primary); font-family: 'Exo 2', sans-serif; }
+#user-input:focus { outline: none; }
+.action-buttons { display: flex; align-items: center; border-left: 1px solid var(--border-color); padding-left: 10px; margin-left: 10px; }
+.action-buttons button { background: none; border: none; color: var(--text-secondary); font-size: 20px; cursor: pointer; padding: 8px; border-radius: 50%; display: flex; transition: color 0.2s, background-color 0.2s; }
+.action-buttons button:hover { color: var(--primary-color); background: rgba(255,255,255,0.1); }
+#toggle-memory-btn.active { color: var(--primary-color); }
+#send-btn { background: var(--primary-color); color: var(--bg-color); }
+
+/* --- ESTILOS RESPONSIVE PARA MÓVIL --- */
+@media (max-width: 768px) {
+    .chat-box { padding: 20px; gap: 20px; }
+    .message-wrapper { max-width: 90%; }
+    .avatar { width: 40px; height: 40px; }
+    #color-core { top: 15px; right: 15px; transform: scale(0.9); }
+    .input-area-wrapper { padding: 15px; }
+    #chat-form { padding: 8px 10px; }
+    .action-buttons { padding-left: 8px; margin-left: 8px; gap: 2px; }
+    .action-buttons button { padding: 6px; font-size: 18px; }
+    #notification-container { bottom: 100px; width: 90%; }
+}

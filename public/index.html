@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Proyecto Singularidad</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Canvas para la Animación de Red Neuronal -->
+    <canvas id="bg-canvas"></canvas>
+    <canvas id="neural-canvas"></canvas>
+
+    <!-- Contenedor para notificaciones -->
+    <div id="notification-container"></div>
+
+    <!-- Pantalla de Introducción (Intacta) -->
+    <div id="intro-overlay">
+        <div class="intro-content">
+            <h1 class="intro-title">NEXUS IA</h1>
+            <p class="intro-subtitle">Iniciando protocolo Singularidad...</p>
+        </div>
+    </div>
+
+    <!-- Contenedor Principal del Chat -->
+    <div class="chat-container" id="chat-container">
+        <!-- Selector de Temas "Color Core" -->
+        <div id="color-core">
+            <div id="core-center"></div>
+            <div id="core-swatches"></div>
+        </div>
+
+        <div class="chat-box" id="chat-box">
+            <!-- Mensajes generados por JS -->
+        </div>
+        <div class="input-area-wrapper">
+            <form id="chat-form">
+                <input type="text" id="user-input" placeholder="Comunicarse con la Singularidad..." autocomplete="off" required>
+                <div class="action-buttons">
+                    <button type="button" id="toggle-memory-btn" class="active" title="Memoria Cognitiva">🧠</button>
+                    <button type="button" id="clear-btn" title="Reiniciar Simulación">🗑️</button>
+                    <button type="button" id="copy-btn" title="Clonar Última Respuesta">📋</button>
+                    <button type="submit" id="send-btn" title="Transmitir">
+                        <svg viewBox="0 0 24 24"><path fill="currentColor" d="M2 3v18l20-9L2 3zm2 2.52L17.53 12 4 18.48V3.52z"/></svg>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
