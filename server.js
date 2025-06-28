@@ -5,35 +5,46 @@ import OpenAI from 'openai';
 import dotenv from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import cors from 'cors'; // <-- Importación de CORS
 
+// --- Carga de variables de entorno ---
 dotenv.config();
-const app = express();
-const port = 3000;
 
+// --- Inicialización de la App ---
+const app = express();
+// Render te proporcionará un puerto a través de process.env.PORT
+const port = process.env.PORT || 3000;
+
+// --- Configuración de CORS (¡MUY IMPORTANTE PARA EL DESPLIEGUE!) ---
+// Esto permite que tu frontend en GitHub Pages hable con este servidor.
+app.use(cors());
+
+// --- Inicialización de OpenAI ---
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
+// --- Configuración para servir archivos estáticos (Frontend) ---
+// Esta es la forma robusta y moderna que funciona en Render
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 app.use(express.static(path.join(__dirname, 'public')));
+
+// --- Middleware para entender JSON ---
 app.use(express.json());
 
+// --- Ruta principal de la API ---
 app.post('/api/chat', async (req, res) => {
   try {
-    // AHORA RECIBIMOS EL HISTORIAL COMPLETO
     const { message, history } = req.body;
 
     if (!message) {
       return res.status(400).json({ error: 'El mensaje es requerido' });
     }
 
-    // Construimos los mensajes para la API, incluyendo el historial
     const messages = [
-      { role: "system", content: "Eres Aura, una IA avanzada, servicial y con un toque de sabiduría. Respondes de forma concisa pero profunda." },
-      // Esparcimos el historial anterior aquí
-      ...history, 
-      // Y añadimos el nuevo mensaje del usuario
+      { role: "system", content: "Eres Nexus, una IA avanzada, servicial y con un toque de sabiduría. Respondes de forma concisa pero profunda." },
+      ...(history || []), // Asegurarse de que history no sea undefined
       { role: "user", content: message }
     ];
 
@@ -50,6 +61,7 @@ app.post('/api/chat', async (req, res) => {
   }
 });
 
+// --- Iniciar el Servidor ---
 app.listen(port, () => {
-  console.log(`Servidor Aura Engine escuchando en http://localhost:${port}`);
+  console.log(`Servidor Nexus escuchando en el puerto ${port}`);
 });
