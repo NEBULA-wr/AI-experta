@@ -124,7 +124,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const loading = addLoadingIndicator();
 
         // ** AQUÍ ESTÁ EL CAMBIO **
-        const backendUrl = 'https://ai-experta-1.onrender.com';
+        const backendUrl = 'https://ai-experta.onrender.com';
 
         try {
             const history = isMemoryEnabled ? chatHistory : [];
